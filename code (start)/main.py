@@ -1,6 +1,7 @@
 from settings import *   # Importing everything from the settings file
 from pytmx.util_pygame import load_pygame  #used to import tmx files[tiled] into pygame
 from os.path import join
+from sprites import Sprite
 # Creating a basic game class
 class Game:
     # General 
@@ -9,6 +10,9 @@ class Game:
         #instance variable display_surface
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption('Monster Hunter')
+
+        #groups
+        self.all_sprites = pygame.sprite.Group()
 
         self.import_assets();
         self.setup(self.tmx_maps['world'], 'house')
@@ -20,7 +24,7 @@ class Game:
 
     def setup(self, tmx_map, player_start_pos):
         for x,y, surf in tmx_map.get_layer_by_name('Terrain').tiles():
-            print(x*TILE_SIZE ,y*TILE_SIZE, surf);
+            Sprite((x*TILE_SIZE ,y*TILE_SIZE), surf, self.all_sprites);
 
     #run method starts an infinite loop so the game keeps running
     def run(self):
@@ -32,6 +36,7 @@ class Game:
                     exit()
 
             #Game Logic
+            self.all_sprites.draw(self.display_surface);
             pygame.display.update();
 
 #common python construct - A very good defining entry point of your program.
