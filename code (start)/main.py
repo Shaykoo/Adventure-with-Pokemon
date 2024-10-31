@@ -2,7 +2,7 @@ from settings import *   # Importing everything from the settings file
 from pytmx.util_pygame import load_pygame  #used to import tmx files[tiled] into pygame
 from os.path import join
 from sprites import Sprite, AnimatedSprite
-from entities import Player
+from entities import Player, Character
 from groups import AllSprites
 from support import *
 # Creating a basic game class
@@ -29,7 +29,8 @@ class Game:
         
         self.overworld_frames = {
             'water': import_folder('..', 'graphics', 'tilesets', 'water'),
-            'coast': coast_importer(24, 12, '..', 'graphics', 'tilesets', 'coast')
+            'coast': coast_importer(24, 12, '..', 'graphics', 'tilesets', 'coast'),
+            'characters': all_character_import('..', 'graphics', 'characters')
         }
         
 
@@ -45,9 +46,18 @@ class Game:
     
         #In tiled map of entities we have player and charatcter in the tiled version #Entities Tiles
         for obj in tmx_map.get_layer_by_name('Entities'):
-            if obj.name == 'Player' and obj.properties['pos'] == player_start_pos:
-                #This new Player object is added to self.all_sprites, a group containing all sprites, allowing it to be managed and drawn by the game engine.
-                self.player = Player((obj.x, obj.y), self.all_sprites) #creating instance of the player
+            if obj.name == 'Player':
+                if obj.properties['pos'] == player_start_pos:
+                    #This new Player object is added to self.all_sprites, a group containing all sprites, allowing it to be managed and drawn by the game engine.
+                    self.player = Player(
+                        pos = (obj.x, obj.y),
+                        frames = self.overworld_frames['characters']['player'], 
+                        groups = self.all_sprites) #creating instance of the player
+            else:
+                Character(
+                    pos = (obj.x, obj.y),
+                    frames = self.overworld_frames['characters'][obj.properties['graphic']], 
+                    groups = self.all_sprites)
 
         #Water tiles
         for obj in tmx_map.get_layer_by_name('Water'):
